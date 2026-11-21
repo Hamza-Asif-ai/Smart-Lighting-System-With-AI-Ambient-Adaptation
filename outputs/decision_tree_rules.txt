@@ -1,0 +1,74 @@
+Decision-tree control rules learned from the sensor data
+ambient_level: 0=Low, 1=Medium, 2=High
+occupancy   : 0 = empty, 1 = occupied | hour: 0-23
+|--- occupancy <= 0.50
+|   |--- hour <= 0.50
+|   |   |--- ambient_level <= 0.50
+|   |   |   |--- brightness: OFF
+|   |   |--- ambient_level >  0.50
+|   |   |   |--- brightness: OFF
+|   |--- hour >  0.50
+|   |   |--- hour <= 6.50
+|   |   |   |--- ambient_level <= 1.50
+|   |   |   |   |--- hour <= 4.50
+|   |   |   |   |   |--- brightness: OFF
+|   |   |   |   |--- hour >  4.50
+|   |   |   |   |   |--- brightness: OFF
+|   |   |   |--- ambient_level >  1.50
+|   |   |   |   |--- brightness: OFF
+|   |   |--- hour >  6.50
+|   |   |   |--- hour <= 11.50
+|   |   |   |   |--- hour <= 8.50
+|   |   |   |   |   |--- brightness: OFF
+|   |   |   |   |--- hour >  8.50
+|   |   |   |   |   |--- brightness: OFF
+|   |   |   |--- hour >  11.50
+|   |   |   |   |--- hour <= 16.50
+|   |   |   |   |   |--- brightness: OFF
+|   |   |   |   |--- hour >  16.50
+|   |   |   |   |   |--- brightness: OFF
+|--- occupancy >  0.50
+|   |--- ambient_level <= 1.50
+|   |   |--- ambient_level <= 0.50
+|   |   |   |--- hour <= 17.50
+|   |   |   |   |--- hour <= 6.50
+|   |   |   |   |   |--- brightness: 90%
+|   |   |   |   |--- hour >  6.50
+|   |   |   |   |   |--- brightness: 80%
+|   |   |   |--- hour >  17.50
+|   |   |   |   |--- hour <= 20.50
+|   |   |   |   |   |--- brightness: 90%
+|   |   |   |   |--- hour >  20.50
+|   |   |   |   |   |--- brightness: 90%
+|   |   |--- ambient_level >  0.50
+|   |   |   |--- hour <= 6.50
+|   |   |   |   |--- hour <= 3.50
+|   |   |   |   |   |--- brightness: 50%
+|   |   |   |   |--- hour >  3.50
+|   |   |   |   |   |--- brightness: 50%
+|   |   |   |--- hour >  6.50
+|   |   |   |   |--- hour <= 9.50
+|   |   |   |   |   |--- brightness: 50%
+|   |   |   |   |--- hour >  9.50
+|   |   |   |   |   |--- brightness: 50%
+|   |--- ambient_level >  1.50
+|   |   |--- hour <= 10.50
+|   |   |   |--- hour <= 8.50
+|   |   |   |   |--- brightness: 20%
+|   |   |   |--- hour >  8.50
+|   |   |   |   |--- hour <= 9.50
+|   |   |   |   |   |--- brightness: 20%
+|   |   |   |   |--- hour >  9.50
+|   |   |   |   |   |--- brightness: 20%
+|   |   |--- hour >  10.50
+|   |   |   |--- hour <= 14.50
+|   |   |   |   |--- hour <= 13.50
+|   |   |   |   |   |--- brightness: 20%
+|   |   |   |   |--- hour >  13.50
+|   |   |   |   |   |--- brightness: 20%
+|   |   |   |--- hour >  14.50
+|   |   |   |   |--- hour <= 16.50
+|   |   |   |   |   |--- brightness: 20%
+|   |   |   |   |--- hour >  16.50
+|   |   |   |   |   |--- brightness: 20%
+

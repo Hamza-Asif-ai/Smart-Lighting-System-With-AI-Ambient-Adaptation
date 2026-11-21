@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "model_name": "DecisionTree",
+  "sklearn_version": "1.9.1",
+  "trained_at_utc": "2026-11-21T09:58:50+00:00",
+  "features": [
+    "ambient_level",
+    "occupancy",
+    "hour"
+  ],
+  "brightness_levels": [
+    "OFF",
+    "20%",
+    "50%",
+    "80%",
+    "90%"
+  ],
+  "ambient_levels": [
+    "Low",
+    "Medium",
+    "High"
+  ],
+  "n_train": 2400,
+  "n_test": 600,
+  "label_noise_ratio": 0.07,
+  "noise_ceiling_accuracy": 0.93,
+  "metrics": {
+    "cv_f1_mean": 0.9295823209532339,
+    "cv_f1_std": 0.009013871903863437,
+    "test_accuracy": 0.9233333333333333,
+    "clean_label_accuracy": 1.0,
+    "rule_coverage": 1.0,
+    "size_kb": 6.3291015625
+  }
+}

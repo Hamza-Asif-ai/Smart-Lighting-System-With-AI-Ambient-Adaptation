@@ -1,0 +1,28 @@
+====================================================================
+SMART LIGHTING - ENERGY ANALYSIS REPORT
+====================================================================
+
+Method:
+  - Chronological simulation: 30 days x 288 steps/day (8,640 steps, 5 min each).
+  - Energy per step = Watts x step_minutes / 60 (Wh); summed and /1000 -> kWh.
+  - One 60 W-equivalent LED bulb; power assumed linear in brightness (20%=12 W, 50%=30 W, 80%=48 W, 90%=54 W).
+  - Tariff ASSUMPTION: PKR 25 per kWh (replace with your bill).
+
+                           Strategy Monthly energy (kWh) Monthly cost (PKR)
+                   Always-on (100%)                43.20              1,080
+Occupancy-only (100% when occupied)                24.60                615
+             Rule-based (reference)                14.33                358
+                           AI model                14.33                358
+
+Savings of the AI model:
+  vs occupancy-only baseline : 41.75%  (10.27 kWh, PKR 257 per month)
+  vs always-on bulb          : 66.83%  (PKR 722 per month)
+  (the ideal rule would save 41.75% vs occupancy-only)
+
+Reliability / comfort check:
+  AI decision matches the control rule on 100.00% of steps.
+  Occupied steps switched OFF by the AI: 0 of 4,920 occupied steps.
+
+Note: figures are for ONE bulb in a simulated room. Multiply by the number
+of fixtures for a whole building; real savings depend on real usage data.
+====================================================================
