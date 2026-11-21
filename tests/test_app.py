@@ -11,7 +11,7 @@ import pytest
 pytest.importorskip("streamlit")
 from streamlit.testing.v1 import AppTest  # noqa: E402
 
-APP_PATH = str(Path(__file__).resolve().parents[1] / "app.py")
+APP_PATH = str(Path(__file__).resolve().parents[1] / "dashboard" / "app.py")
 
 
 def _walk(node):

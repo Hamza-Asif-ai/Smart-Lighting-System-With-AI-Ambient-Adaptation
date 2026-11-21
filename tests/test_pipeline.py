@@ -9,10 +9,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import energy_analysis
-import inference
-import train_model
-from config import (
+from src import energy_analysis
+from src import inference
+from src import train_model
+from src.config import (
     BRIGHTNESS_LEVELS,
     BULB_FULL_WATT,
     NOISE_RATIO,
@@ -20,8 +20,8 @@ from config import (
     SIM_DAYS,
     STEP_MINUTES,
 )
-from features import decode_target, encode_features, encode_target
-from sensor_simulator import (
+from src.features import decode_target, encode_features, encode_target
+from src.sensor_simulator import (
     all_states,
     generate_dataset,
     rule_brightness,

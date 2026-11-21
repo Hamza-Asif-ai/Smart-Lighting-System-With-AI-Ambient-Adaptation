@@ -44,7 +44,7 @@ from sklearn.pipeline import make_pipeline  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
 from sklearn.tree import DecisionTreeClassifier, export_text  # noqa: E402
 
-from config import (  # noqa: E402
+from src.config import (  # noqa: E402
     AMBIENT_LEVELS,
     BRIGHTNESS_LEVELS,
     COMPARISON_CSV,
@@ -64,8 +64,8 @@ from config import (  # noqa: E402
     TEST_SIZE,
     create_directories,
 )
-from features import decode_target, encode_features, encode_target  # noqa: E402
-from sensor_simulator import all_states, generate_dataset, set_seed  # noqa: E402
+from src.features import decode_target, encode_features, encode_target  # noqa: E402
+from src.sensor_simulator import all_states, generate_dataset, set_seed  # noqa: E402
 
 
 def load_dataset(path=DATA_PATH):

@@ -6,7 +6,7 @@ that the sensor -> model contract is defined in exactly one place.
 
 import pandas as pd
 
-from config import (
+from src.config import (
     AMBIENT_LEVELS,
     AMBIENT_TO_CODE,
     BRIGHTNESS_LEVELS,

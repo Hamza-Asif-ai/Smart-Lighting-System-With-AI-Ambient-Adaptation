@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 
-from config import (  # noqa: E402
+from src.config import (  # noqa: E402
     BULB_FULL_WATT,
     DAYS_PER_MONTH,
     ENERGY_BY_HOUR_PNG,
@@ -38,7 +38,7 @@ from config import (  # noqa: E402
     WATT_MAP,
     create_directories,
 )
-from inference import simulate_day_decisions  # noqa: E402
+from src.inference import simulate_day_decisions  # noqa: E402
 
 STRATEGY_LABELS = {
     "always_on": "Always-on (100%)",

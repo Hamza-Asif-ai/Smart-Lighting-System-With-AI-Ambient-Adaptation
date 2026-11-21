@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 
-from config import (  # noqa: E402
+from src.config import (  # noqa: E402
     AMBIENT_LEVELS,
     AMBIENT_VS_BRIGHTNESS_PNG,
     BRIGHTNESS_DIST_PNG,
@@ -24,8 +24,8 @@ from config import (  # noqa: E402
     SIM_SEED,
     create_directories,
 )
-from inference import simulate_day_decisions  # noqa: E402
-from train_model import load_dataset  # noqa: E402
+from src.inference import simulate_day_decisions  # noqa: E402
+from src.train_model import load_dataset  # noqa: E402
 
 PALETTE = "viridis"
 

@@ -76,7 +76,7 @@ OCCUPANCY_LEAVE_PROB = 0.05  # per step; mean stay ~ 100 min at 5-min steps
 # ---------------------------------------------------------------------------
 # Paths (all relative to the project root, resolved once)
 # ---------------------------------------------------------------------------
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 MODELS_DIR = BASE_DIR / "models"
 OUTPUTS_DIR = BASE_DIR / "outputs"

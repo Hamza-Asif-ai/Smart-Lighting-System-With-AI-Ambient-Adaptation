@@ -11,9 +11,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import actuator
-import inference
-from actuator import (
+from src import actuator
+from src import inference
+from src.actuator import (
     DimmableBulb,
     bulb_html,
     clock_label,
@@ -25,7 +25,7 @@ from actuator import (
     pwm_duty,
     simulate_actuator,
 )
-from config import (
+from src.config import (
     BRIGHTNESS_LEVELS,
     BULB_FULL_WATT,
     FADE_RATE_PCT_PER_S,

@@ -1,13 +1,17 @@
 """Streamlit live dashboard for the AI ambient-adaptive lighting simulator."""
 
 import io
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
-from actuator import (
+from src.actuator import (
     build_actuator_figure,
     bulb_html,
     command_message,
@@ -16,7 +20,7 @@ from actuator import (
     pwm_duty,
     simulate_actuator,
 )
-from config import (
+from src.config import (
     AMBIENT_LEVELS,
     BULB_FULL_WATT,
     COMPARISON_CSV,
@@ -30,10 +34,10 @@ from config import (
     WATT_MAP,
     create_directories,
 )
-from energy_analysis import compute_energy
-from inference import generate_simulation, load_artifacts, predict_action, simulate_day_decisions
-from sensor_simulator import rule_brightness
-from visualize import build_day_figure
+from src.energy_analysis import compute_energy
+from src.inference import generate_simulation, load_artifacts, predict_action, simulate_day_decisions
+from src.sensor_simulator import rule_brightness
+from src.visualize import build_day_figure
 
 matplotlib.use("Agg")
 

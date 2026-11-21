@@ -12,7 +12,7 @@ import os
 import subprocess
 import sys
 
-from config import (
+from src.config import (
     BASE_DIR,
     DATA_PATH,
     ACTUATOR_RESPONSE_PNG,
@@ -24,12 +24,12 @@ from config import (
 )
 
 SCRIPTS = [
-    ["sensor_simulator.py"],
-    ["train_model.py"],
-    ["inference.py"],
-    ["visualize.py"],
-    ["energy_analysis.py"],
-    ["actuator.py"],
+    ["src/sensor_simulator.py"],
+    ["src/train_model.py"],
+    ["src/inference.py"],
+    ["src/visualize.py"],
+    ["src/energy_analysis.py"],
+    ["src/actuator.py"],
 ]
 
 
@@ -38,7 +38,7 @@ def run_script(command):
     print("\n" + "=" * 68)
     print(f"RUNNING: {' '.join(command)}")
     print("=" * 68, flush=True)
-    environment = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+    environment = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONPATH": str(BASE_DIR)}
     subprocess.run(
         [sys.executable, str(BASE_DIR / command[0]), *command[1:]],
         cwd=str(BASE_DIR),
@@ -96,7 +96,7 @@ def main():
     print(f"  PNG figures    : {len(png_files)} in {OUTPUTS_DIR}")
     for path in png_files:
         print(f"    - {path.name}")
-    print("  Dashboard      : streamlit run app.py")
+    print("  Dashboard      : streamlit run dashboard/app.py")
     print("#" * 68)
 
 

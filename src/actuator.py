@@ -30,7 +30,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from config import (  # noqa: E402
+from src.config import (  # noqa: E402
     ACTUATOR_EVENTS_CSV,
     ACTUATOR_LOG_CSV,
     ACTUATOR_RESPONSE_PNG,
@@ -591,7 +591,7 @@ def main():
     parser.add_argument("--seed", type=int, default=SIM_SEED, help="day-simulation seed")
     args = parser.parse_args()
 
-    from inference import simulate_day_decisions  # local import keeps the module light
+    from src.inference import simulate_day_decisions  # local import keeps the module light
 
     create_directories()
     decisions = simulate_day_decisions(n_days=1, seed=args.seed)

@@ -15,7 +15,7 @@ import joblib
 import pandas as pd
 import sklearn
 
-from config import (
+from src.config import (
     BRIGHTNESS_LEVELS,
     META_PATH,
     MODEL_PATH,
@@ -25,8 +25,8 @@ from config import (
     SIMULATION_LOG_CSV,
     create_directories,
 )
-from features import decode_target, encode_features
-from sensor_simulator import (
+from src.features import decode_target, encode_features
+from src.sensor_simulator import (
     flip_label,
     rule_brightness,
     sample_reading,
@@ -73,7 +73,7 @@ def load_artifacts():
     """
     loaded = _try_load_artifacts()
     if loaded is None:
-        from train_model import run_training  # local import avoids a cycle
+        from src.train_model import run_training  # local import avoids a cycle
 
         print("[inference] Model artefacts missing or incompatible - retraining...",
               file=sys.stderr)

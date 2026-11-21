@@ -15,7 +15,7 @@ import random
 import numpy as np
 import pandas as pd
 
-from config import (
+from src.config import (
     AMBIENT_HIGH_MIN,
     AMBIENT_LEVELS,
     AMBIENT_LOW_MAX,
