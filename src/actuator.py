@@ -31,12 +31,11 @@ import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 
 # Make `python src/<script>.py` work as well as `python -m src.<script>`.
-import sys as _sys  # noqa: E402
 from pathlib import Path as _Path  # noqa: E402
 
 _ROOT = str(_Path(__file__).resolve().parents[1])
-if _ROOT not in _sys.path:
-    _sys.path.insert(0, _ROOT)
+if _ROOT not in sys.path:
+    sys.path.insert(0, _ROOT)
 
 from src.config import (  # noqa: E402
     ACTUATOR_EVENTS_CSV,
@@ -110,6 +109,7 @@ class DimmableBulb:
 
     def __init__(self, rated_watt=BULB_FULL_WATT, fade_rate=FADE_RATE_PCT_PER_S,
                  pwm_bits=PWM_BITS, initial="OFF"):
+        """Initialise one simulated dimmable bulb and its energy counters."""
         if fade_rate <= 0:
             raise ValueError("fade_rate must be positive.")
         if rated_watt <= 0:
@@ -305,6 +305,7 @@ def build_actuator_figure(log):
     ax1, ax2, ax3, ax4 = axes
 
     def shade(ax):
+        """Shade occupied intervals on an actuator plot axis."""
         if occupied is not None:
             ax.fill_between(time_h, 0, 1, where=occupied, step="post", alpha=0.18,
                             color="#e9c46a", transform=ax.get_xaxis_transform(),
@@ -415,6 +416,7 @@ def _bulb_svg():
 
 
 def _page(body, script):
+    """Wrap trusted body HTML and script in a minimal standalone page."""
     return (
         '<!DOCTYPE html><html><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'

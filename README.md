@@ -9,7 +9,7 @@ in pure Python with fixed seeds, so every number below is reproducible.
 
 | | |
 |---|---|
-| Deployed model | Decision Tree, **6.4 KB**, CV F1 **0.930**, held-out accuracy **92.3 %** (ceiling with 7 % label noise: 93 %) |
+| Deployed model | Decision Tree, **6.3 KB**, CV F1 **0.930**, held-out accuracy **92.3 %** (ceiling with 7 % label noise: 93 %) |
 | Correctness | Matches the control rule on **144 / 144** possible sensor states; **0** occupied time-steps switched OFF |
 | Energy saving | **41.8 %** vs a motion-sensor switch · **66.8 %** vs an always-on bulb |
 | Actuator | Simulated 8-bit PWM LED driver, 50 %/s soft fade, MQTT-style commands; fading changes energy by only +0.002 % |
