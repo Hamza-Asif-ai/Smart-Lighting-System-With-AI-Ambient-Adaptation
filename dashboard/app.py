@@ -25,12 +25,18 @@ from src.config import (
     BULB_FULL_WATT,
     COMPARISON_CSV,
     CONFUSION_PNG,
+    CV_FOLDS,
     FADE_RATE_PCT_PER_S,
     FEATURE_IMPORTANCE_PNG,
+    N_SAMPLES,
+    NOISE_RATIO,
     PRICE_PER_KWH_PKR,
     PWM_BITS,
     RULES_TXT,
+    SIM_DAYS,
     SIM_SEED,
+    STEP_MINUTES,
+    TEST_SIZE,
     WATT_MAP,
     create_directories,
 )
@@ -64,6 +70,17 @@ def cached_day(seed):
 def cached_actuator_day(seed):
     """Drive the simulated bulb through one day of AI decisions (cached by seed)."""
     return simulate_actuator(cached_day(int(seed)))
+
+
+@st.cache_data(show_spinner=False)
+def cached_month_summary():
+    """Headline energy numbers from the same 30-day run used by the energy report."""
+    results = compute_energy(simulate_day_decisions(n_days=SIM_DAYS, seed=SIM_SEED))
+    keep = ("saving_vs_occupancy_pct", "saving_vs_always_on_pct",
+            "occupied_steps", "occupied_but_off_steps")
+    summary = {key: results[key] for key in keep}
+    summary["monthly_kwh"] = dict(results["monthly_kwh"])
+    return summary
 
 
 @st.cache_data(show_spinner=False)
@@ -250,37 +267,86 @@ def render_model_tab():
 
 
 def render_about_tab():
-    """Render the project background and methodology."""
+    """Describe the project; every number is read from the saved model or a live run."""
     st.header("About This Project")
-    st.markdown(
-        f"""
-        **A8 - Smart Lighting System with AI Ambient Adaptation** is a fully
-        simulated AIoT project. No hardware is needed: synthetic sensors produce
-        ambient-light, occupancy and time-of-day readings, and a trained
-        classifier selects an energy-efficient brightness level in real time.
+    _, meta = get_artifacts()
+    metrics = meta["metrics"]
+    month = cached_month_summary()
+    kwh = month["monthly_kwh"]
+    split = f"{round((1 - TEST_SIZE) * 100)}/{round(TEST_SIZE * 100)}"
+    duty_max = 2 ** PWM_BITS - 1
 
-        ### Methodology
-        1. Generate 3,000 reproducible sensor samples with realistic hourly
-           distributions and 7% label noise.
-        2. Compare Decision Tree, k-NN and Random Forest with 5-fold
-           cross-validation on a stratified 80/20 split; pick the best CV score
-           (smallest model wins ties).
-        3. Verify the winner against the control rule on all 144 possible
-           sensor states.
-        4. Run it on a chronological multi-day simulation to estimate energy.
-        5. Drive a simulated dimmable LED driver (PWM, soft fade, MQTT-style
-           commands) with the decisions - the actuator end of the AIoT loop.
-
-        ### Control rule (ground truth)
-        Unoccupied -> OFF; bright ambient -> 20%; medium ambient -> 50%;
-        dark ambient at night -> 90%; dark ambient in daytime -> 80%.
-
-        ### Energy model
-        One {BULB_FULL_WATT} W-equivalent bulb, power linear in brightness,
-        tariff PKR {PRICE_PER_KWH_PKR}/kWh (an assumption - use your own bill).
-        The conservative baseline is a motion-sensor switch (100% while occupied).
-        """
-    )
+    lines = [
+        "**A8 - Smart Lighting System with AI Ambient Adaptation** is a fully simulated "
+        "AIoT project. No hardware is needed: synthetic sensors produce ambient-light, "
+        "occupancy and time-of-day readings, a trained classifier selects an "
+        "energy-efficient brightness level, and a simulated LED driver carries it out.",
+        "",
+        "### Headline results",
+        f"- **Model:** {meta['model_name']} ({metrics['size_kb']:.1f} KB). Cross-validated "
+        f"F1 {metrics['cv_f1_mean']:.3f}; held-out accuracy {metrics['test_accuracy']:.1%} "
+        f"(the {NOISE_RATIO:.0%} label noise caps this near "
+        f"{meta['noise_ceiling_accuracy']:.0%}); it matches the control rule on "
+        f"{metrics['rule_coverage']:.0%} of all 144 possible sensor states.",
+        f"- **Energy** (one bulb, {SIM_DAYS}-day simulation): always-on "
+        f"{kwh['always_on']:.2f} kWh, occupancy-only {kwh['occupancy_only']:.2f} kWh, "
+        f"AI {kwh['ai']:.2f} kWh. That is **{month['saving_vs_occupancy_pct']:.1f}% saved** "
+        f"versus occupancy-only and {month['saving_vs_always_on_pct']:.1f}% versus always-on.",
+        f"- **Safety:** the AI switched an occupied room OFF in "
+        f"{month['occupied_but_off_steps']} of {month['occupied_steps']:,} occupied steps.",
+        "",
+        "### What each tab does",
+        "- **Live Prediction** - set ambient light, occupancy and hour in the sidebar; "
+        "the model picks a brightness and it is compared with the control rule and with an "
+        "occupancy-only switch.",
+        "- **Virtual Bulb** - turns the decision into an MQTT-style command, a PWM value "
+        "and a soft fade, and replays a whole simulated day (Play / Pause / slider).",
+        "- **Day Simulation** - one chronological day in "
+        f"{STEP_MINUTES}-minute steps with its energy use; the day is chosen by the "
+        "seed in the sidebar.",
+        "- **Model Performance** - the three classifiers compared, confusion matrix, "
+        "feature importance and the learned decision-tree rules.",
+        "- **About** - this page.",
+        "",
+        "### Methodology",
+        f"1. Generate {N_SAMPLES:,} reproducible sensor samples with realistic hourly "
+        f"distributions and {NOISE_RATIO:.0%} label noise.",
+        f"2. Compare Decision Tree, k-NN and Random Forest with {CV_FOLDS}-fold "
+        f"cross-validation on a stratified {split} train/test split; pick the best CV "
+        "score (the smallest model wins ties).",
+        "3. Verify the winner against the control rule on all 144 possible sensor states "
+        "(3 ambient levels x 2 occupancy values x 24 hours).",
+        f"4. Run it on a chronological {SIM_DAYS}-day simulation "
+        f"({STEP_MINUTES}-minute steps) to estimate energy.",
+        "5. Drive a simulated dimmable LED driver with the decisions - the actuator end "
+        "of the AIoT loop.",
+        "",
+        "### Control rule (ground truth)",
+        "Unoccupied -> OFF; bright ambient -> 20%; medium ambient -> 50%; dark ambient -> "
+        "90% at night (18:00-06:59) or 80% in the daytime (07:00-17:59).",
+        "",
+        "### Actuator model",
+        f"{PWM_BITS}-bit PWM duty (0-{duty_max}), soft fade at {FADE_RATE_PCT_PER_S:.0f} %/s "
+        f"(0-100% in {100 / FADE_RATE_PCT_PER_S:.1f} s) and MQTT-style command messages "
+        "(formatted only - no real broker is used).",
+        "",
+        "### Energy model",
+        f"One {BULB_FULL_WATT} W-equivalent bulb with power linear in brightness; energy "
+        f"is power x time over {STEP_MINUTES}-minute steps; tariff PKR {PRICE_PER_KWH_PKR}/kWh "
+        "(an assumption - use your own bill). The conservative baseline is a motion-sensor "
+        "switch (100% while occupied).",
+        "",
+        "### Limitations",
+        "- The data is synthetic and its labels come from a hand-written rule, so the "
+        "model matching that rule shows a correct ML workflow, not real-world performance.",
+        "- Energy figures are for one simulated bulb and depend on the assumed tariff "
+        "and power curve.",
+        "- PWM resolution, fade rate and the MQTT messages are modelling assumptions, "
+        "not measurements from real hardware.",
+    ]
+    st.markdown("\n".join(lines))
+    st.caption("Hamza Asif - Roll No. 23-AI-93 - Dawood University of Engineering and "
+               "Technology (DUET), Karachi")
 
 
 def main():

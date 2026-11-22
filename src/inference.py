@@ -15,6 +15,14 @@ import joblib
 import pandas as pd
 import sklearn
 
+# Make `python src/<script>.py` work as well as `python -m src.<script>`.
+import sys as _sys  # noqa: E402
+from pathlib import Path as _Path  # noqa: E402
+
+_ROOT = str(_Path(__file__).resolve().parents[1])
+if _ROOT not in _sys.path:
+    _sys.path.insert(0, _ROOT)
+
 from src.config import (
     BRIGHTNESS_LEVELS,
     META_PATH,

@@ -52,23 +52,25 @@ and measures the resulting energy and cost savings.
 ## Folder Structure
 
 ```
-smart_lighting_aiot/
+Smart-Lighting-System-With-AI-Ambient-Adaptation/
 ├── README.md
 ├── requirements.txt
-├── config.py              # all constants and paths (single source of truth)
-├── features.py            # feature/target encoding + input validation
-├── sensor_simulator.py    # training-data generator + chronological day simulator
-├── train_model.py         # CV, model selection, exhaustive rule verification
-├── inference.py           # predict_action(), batch prediction, auto-recovery
-├── visualize.py           # exploratory + decision plots
-├── energy_analysis.py     # physically consistent energy / cost model
-├── actuator.py            # simulated LED driver: PWM, soft fade, MQTT-style commands, virtual bulb
-├── app.py                 # Streamlit dashboard (5 tabs incl. Virtual Bulb)
-├── run_all.py             # one-command pipeline  (--live, --test)
-├── tests/                 # 84 pytest checks (pipeline, actuator, dashboard)
+├── run_all.py                # one-command pipeline  (--live, --test)
+├── src/
+│   ├── config.py             # all constants and paths (single source of truth)
+│   ├── features.py           # feature/target encoding + input validation
+│   ├── sensor_simulator.py   # training-data generator + chronological day simulator
+│   ├── train_model.py        # CV, model selection, exhaustive rule verification
+│   ├── inference.py          # predict_action(), batch prediction, auto-recovery
+│   ├── visualize.py          # exploratory + decision plots
+│   ├── energy_analysis.py    # physically consistent energy / cost model
+│   └── actuator.py           # simulated LED driver: PWM, soft fade, MQTT-style commands, virtual bulb
+├── dashboard/
+│   └── app.py                # Streamlit dashboard (5 tabs incl. Virtual Bulb)
+├── tests/                    # 97 pytest checks (pipeline, actuator, dashboard, repo layout)
 ├── data/lighting_data.csv
-├── models/                # best_model.pkl, model_meta.json
-└── outputs/               # figures, CSVs, energy report, learned rules
+├── models/                   # best_model.pkl, model_meta.json
+└── outputs/                  # figures, CSVs, energy report, learned rules
 ```
 
 ## Setup
@@ -86,12 +88,13 @@ pip install -r requirements.txt
 python run_all.py            # data -> train -> inference -> plots -> energy -> actuator
 python run_all.py --test     # ...and run the test suite afterwards
 python run_all.py --live     # slow the inference stage down to feel like a live feed
-python actuator.py           # actuator only: one simulated day (--seed N for another)
-streamlit run app.py         # interactive dashboard with the Virtual Bulb tab
+python src/actuator.py       # actuator only: one simulated day (--seed N for another)
+streamlit run dashboard/app.py   # interactive dashboard with the Virtual Bulb tab
 python -m pytest -q          # tests only
 ```
 
-Every script also runs standalone (e.g. `python train_model.py`). If the model
+Every script in `src/` also runs standalone, either as `python src/train_model.py`
+or as a module from the repository root (`python -m src.train_model`). If the model
 files are missing, corrupt, or were created with a different scikit-learn
 version, the dashboard and `inference.py` **retrain automatically** instead of
 crashing.
@@ -120,7 +123,7 @@ crashing.
    (8,640 steps). Energy = Watts × (5 / 60) h, summed and divided by 1,000.
 
 7. **Actuator** – the AI decision is turned into what a real fixture does
-   (`actuator.py`): an MQTT-style command (`topic` + JSON payload), an 8-bit PWM
+   (`src/actuator.py`): an MQTT-style command (`topic` + JSON payload), an 8-bit PWM
    duty value for the LED driver, and a **soft fade** limited to 50 %/s (0 → 100 %
    in 2 s) instead of a hard jump. `DimmableBulb` integrates power over the ramp
    exactly (trapezoid rule), counts commands and turn-on events, and ignores
@@ -190,7 +193,7 @@ and a timeline. The player runs entirely client-side, so playback is smooth.
 
 ## Testing
 
-`python -m pytest -q` runs 84 checks (about 15 s), including: the control-rule truth table,
+`python -m pytest -q` runs 97 checks (about 30 s), including: the control-rule truth table,
 dataset reproducibility and exact noise rate, plausibility of the day simulator,
 input validation, **model correctness on all 144 states**, safety (never OFF
 when occupied), energy-unit regression tests (a 60 W bulb can never use more
@@ -199,7 +202,9 @@ model files. The actuator tests check the physics against hand-calculated values
 (e.g. a 0 → 90 % fade draws exactly 27 W on average for 1.8 s), the PWM mapping,
 command counters, the MQTT payloads, and that the actuator's energy matches the
 energy model. The dashboard tests drive the real widgets headlessly (Streamlit
-`AppTest`), including all 30 sensor combinations.
+`AppTest`), including all 30 sensor combinations, and re-compute every number
+shown on the About tab. The layout tests check that each script runs directly from
+any directory and that every command in this README points to a file that exists.
 
 ## Assumptions and Limitations
 

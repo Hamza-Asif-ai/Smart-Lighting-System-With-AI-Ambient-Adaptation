@@ -137,3 +137,52 @@ def test_every_sidebar_combination_runs_cleanly():
                     assert metrics["AI command"] == "OFF"
                 else:
                     assert metrics["AI command"] != "OFF"
+
+
+def test_about_tab_is_accurate_and_complete(app):
+    """Every claim in the About tab must match the saved model and a fresh calculation."""
+    import json
+
+    import numpy as np
+
+    from src.config import META_PATH, WATT_MAP
+    from src.inference import simulate_day_decisions
+
+    text = "\n".join(item.value for item in app.tabs[4].markdown)
+    meta = json.loads(META_PATH.read_text(encoding="utf-8"))
+    metrics = meta["metrics"]
+
+    # headline model numbers come straight from the saved metadata
+    assert meta["model_name"] in text
+    assert f"F1 {metrics['cv_f1_mean']:.3f}" in text
+    assert f"held-out accuracy {metrics['test_accuracy']:.1%}" in text
+    assert "144 possible sensor states" in text and f"{metrics['rule_coverage']:.0%}" in text
+
+    # energy numbers recomputed independently from a 30-day stream
+    stream = simulate_day_decisions(n_days=30)
+    hours = 5 / 60
+    always = 60 * len(stream) * hours / 1000
+    occupancy_only = 60 * stream["occupancy"].sum() * hours / 1000
+    ai = stream["predicted_brightness"].map(WATT_MAP).sum() * hours / 1000
+    assert f"always-on {always:.2f} kWh" in text
+    assert f"occupancy-only {occupancy_only:.2f} kWh" in text
+    assert f"AI {ai:.2f} kWh" in text
+    assert f"{(occupancy_only - ai) / occupancy_only * 100:.1f}% saved" in text
+    assert f"{(always - ai) / always * 100:.1f}% versus always-on" in text
+    occupied = int(stream["occupancy"].sum())
+    unsafe = int(((stream["occupancy"] == 1) & (stream["predicted_brightness"] == "OFF")).sum())
+    assert f"{unsafe} of {occupied:,} occupied steps" in text
+
+    # method description matches the real configuration
+    for fragment in ("3,000 reproducible", "7% label noise", "5-fold", "80/20",
+                     "30-day simulation", "5-minute steps", "8-bit PWM", "0-255",
+                     "50 %/s", "PKR 25/kWh", "60 W-equivalent", "18:00-06:59",
+                     "07:00-17:59", "Limitations", "synthetic"):
+        assert fragment in text, fragment
+
+    # every tab is described, and no template placeholder leaked into the page
+    for tab_name in ("Live Prediction", "Virtual Bulb", "Day Simulation",
+                     "Model Performance", "About"):
+        assert f"**{tab_name}**" in text
+    assert "{" not in text and "}" not in text
+    assert any("23-AI-93" in caption.value for caption in app.tabs[4].caption)

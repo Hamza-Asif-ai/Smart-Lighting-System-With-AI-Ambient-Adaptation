@@ -44,6 +44,14 @@ from sklearn.pipeline import make_pipeline  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
 from sklearn.tree import DecisionTreeClassifier, export_text  # noqa: E402
 
+# Make `python src/<script>.py` work as well as `python -m src.<script>`.
+import sys as _sys  # noqa: E402
+from pathlib import Path as _Path  # noqa: E402
+
+_ROOT = str(_Path(__file__).resolve().parents[1])
+if _ROOT not in _sys.path:
+    _sys.path.insert(0, _ROOT)
+
 from src.config import (  # noqa: E402
     AMBIENT_LEVELS,
     BRIGHTNESS_LEVELS,
@@ -190,8 +198,9 @@ def plot_comparison(comparison, noise_ceiling):
     plt.figure(figsize=(10, 6))
     ax = sns.barplot(data=long, x="Model", y="Score", hue="Metric", palette="viridis")
     for container in ax.containers:
-        ax.bar_label(container, fmt="%.3f", padding=2, fontsize=8)
-    ax.axhline(noise_ceiling, color="crimson", linestyle="--", linewidth=1.2,
+        ax.bar_label(container, fmt="%.3f", padding=2, fontsize=8,
+                     bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.8, "alpha": 0.85})
+    ax.axhline(noise_ceiling, color="crimson", linestyle="--", linewidth=1.2, zorder=1,
                label=f"Noise ceiling vs noisy labels ({noise_ceiling:.0%})")
     ax.set_ylim(0.7, 1.04)
     ax.set_title("Classifier Comparison (cross-validated and held-out)")

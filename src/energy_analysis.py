@@ -24,6 +24,14 @@ import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 
+# Make `python src/<script>.py` work as well as `python -m src.<script>`.
+import sys as _sys  # noqa: E402
+from pathlib import Path as _Path  # noqa: E402
+
+_ROOT = str(_Path(__file__).resolve().parents[1])
+if _ROOT not in _sys.path:
+    _sys.path.insert(0, _ROOT)
+
 from src.config import (  # noqa: E402
     BULB_FULL_WATT,
     DAYS_PER_MONTH,
@@ -189,14 +197,21 @@ def plot_energy_comparison(results):
 def plot_saving_pie(results):
     """Pie chart of energy saved versus consumed relative to occupancy-only."""
     saved = results["saving_vs_occupancy_pct"]
-    plt.figure(figsize=(7, 6))
-    plt.pie(
+    plt.figure(figsize=(7.5, 6.2))
+    wedges, _, _ = plt.pie(
         [saved, 100 - saved],
-        labels=[f"Energy saved ({saved:.1f}%)", f"Energy used ({100 - saved:.1f}%)"],
         autopct="%1.1f%%",
         startangle=90,
         colors=["#81b29a", "#e07a5f"],
         wedgeprops={"edgecolor": "white"},
+        textprops={"fontsize": 12},
+    )
+    plt.legend(
+        wedges,
+        [f"Energy saved ({saved:.1f}%)", f"Energy used ({100 - saved:.1f}%)"],
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.04),
+        ncol=2,
     )
     plt.title("AI Energy Saving vs Occupancy-only Baseline")
     plt.tight_layout()

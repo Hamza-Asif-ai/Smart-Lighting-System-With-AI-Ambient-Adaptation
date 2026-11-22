@@ -12,6 +12,14 @@ import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 
+# Make `python src/<script>.py` work as well as `python -m src.<script>`.
+import sys as _sys  # noqa: E402
+from pathlib import Path as _Path  # noqa: E402
+
+_ROOT = str(_Path(__file__).resolve().parents[1])
+if _ROOT not in _sys.path:
+    _sys.path.insert(0, _ROOT)
+
 from src.config import (  # noqa: E402
     AMBIENT_LEVELS,
     AMBIENT_VS_BRIGHTNESS_PNG,
